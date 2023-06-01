@@ -37,41 +37,47 @@ class DeployCommand extends Command
         $all = $this->option('all');
 
         // Check to see if the deploy.json exists
-        if (!File::exists(getcwd() . '/deploy.json')) {
+        if (! File::exists(getcwd().'/deploy.json')) {
             $this->error('deploy.json does not exist.');
+
             return Command::FAILURE;
         }
 
         // Get the contents of the deploy.json
-        $deploy = json_decode(File::get(getcwd() . '/deploy.json'), true);
+        $deploy = json_decode(File::get(getcwd().'/deploy.json'), true);
 
         // Check to see if the servers key exists
-        if (!array_key_exists('servers', $deploy)) {
+        if (! array_key_exists('servers', $deploy)) {
             $this->error('servers key does not exist in deploy.json.');
+
             return Command::FAILURE;
         }
 
         // Check to see if the servers key is an array
-        if (!is_array($deploy['servers'])) {
+        if (! is_array($deploy['servers'])) {
             $this->error('servers key is not an array in deploy.json.');
+
             return Command::FAILURE;
         }
 
         // Check to see if the servers array is empty
         if (empty($deploy['servers'])) {
             $this->error('servers array is empty in deploy.json.');
+
             return Command::FAILURE;
         }
 
         // Check to see if the commands key exists
-        if (!array_key_exists('commands', $deploy)) {
+        if (! array_key_exists('commands', $deploy)) {
             $this->error('commands key does not exist in deploy.json.');
+
             return Command::FAILURE;
         }
 
         // Check to see if the commands key is an array
-        if (!is_array($deploy['commands'])) {
+        if (! is_array($deploy['commands'])) {
             $this->error('commands key is not an array in deploy.json.');
+
             return Command::FAILURE;
         }
 
@@ -83,14 +89,14 @@ class DeployCommand extends Command
         $servers = new Collection($serversArr);
         $commands = new Collection($commandsArr);
 
-        if($tags){
+        if ($tags) {
             // Get all servers that have the tags
             $servers = $servers->filter(function ($server) use ($tags) {
                 return in_array($tags, $server['tags']);
             });
         }
 
-        if(!$tags && !$all) {
+        if (! $tags && ! $all) {
             $serverChoice = $this->choice('Which servers would you like to deploy to?',
                 $servers->pluck('name')->toArray(),
                 0,
@@ -109,43 +115,42 @@ class DeployCommand extends Command
             $serverCommand = [];
 
             // Get the commands for the server by its category
-            foreach ($commands as $stage => $command){
-                if(in_array($stage, $serverCommandTags)){
-                    foreach ($command as $item){
+            foreach ($commands as $stage => $command) {
+                if (in_array($stage, $serverCommandTags)) {
+                    foreach ($command as $item) {
                         $serverCommands[] = $item;
                     }
                 }
             }
 
-            if(count($serverCommands) == 0) {
-                $this->error('No commands found for ' . $server['name']);
+            if (count($serverCommands) == 0) {
+                $this->error('No commands found for '.$server['name']);
+
                 return Command::FAILURE;
-            }
-            else{
+            } else {
                 // Prepend the commands with the cd command
-                array_unshift($serverCommands, 'cd ' . $server['path']);
-                array_unshift($serverCommands, 'mkdir -p ' . $server['path']);
+                array_unshift($serverCommands, 'cd '.$server['path']);
+                array_unshift($serverCommands, 'mkdir -p '.$server['path']);
             }
 
             // Get the private key from ~/.ssh/config
             // Because we run the command as the user, we need to get the private key from the config
 
-
-            $this->info('Deploying to ' . $server['name']);
+            $this->info('Deploying to '.$server['name']);
 
             $process = Ssh::create($server['user'], $server['host'], $server['port'] ?? 22)
-                ->usePrivateKey(getenv('HOME') . '/.ssh/id_rsa')
+                ->usePrivateKey(getenv('HOME').'/.ssh/id_rsa')
                 ->disablePasswordAuthentication()
-                ->onOutput(function($type, $line) {
+                ->onOutput(function ($type, $line) {
                     $this->line($line);
                 })
                 ->execute($serverCommands);
 
-            if($process->isSuccessful()){
-                $this->info('Deployed to ' . $server['name']);
-            }
-            else{
-                $this->error('Failed to deploy to ' . $server['name']);
+            if ($process->isSuccessful()) {
+                $this->info('Deployed to '.$server['name']);
+            } else {
+                $this->error('Failed to deploy to '.$server['name']);
+
                 return Command::FAILURE;
             }
 
@@ -158,9 +163,6 @@ class DeployCommand extends Command
 
     /**
      * Define the command's schedule.
-     *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
-     * @return void
      */
     public function schedule(Schedule $schedule): void
     {

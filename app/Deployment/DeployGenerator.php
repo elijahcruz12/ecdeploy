@@ -1,12 +1,15 @@
 <?php
 
-namespace App\Json;
+namespace App\Deployment;
 
 class DeployGenerator
 {
     public string $projectName;
+
     public string|null $projectRepo = null;
+
     public array $servers = [];
+
     public array $commands = [];
 
     public function __construct(string $projectName, string|null $projectRepo = null)
@@ -35,10 +38,10 @@ class DeployGenerator
                 'user' => '',
                 'port' => 22,
                 'tags' => [
-                    'production'
+                    'production',
                 ],
-                'path' => '~/' . $this->projectName,
-                'commands' => ['before', 'during', 'after']
+                'path' => '~/'.$this->projectName,
+                'commands' => ['before', 'during', 'after'],
             ],
         ];
 
@@ -53,6 +56,7 @@ class DeployGenerator
 
     /**
      * Make the commands array the default.
+     *
      * @return $this
      */
     public function defaultCommands(): static
@@ -61,7 +65,7 @@ class DeployGenerator
             'before' => [],
             'during' => [],
             'after' => [],
-            'extra' => []
+            'extra' => [],
         ];
 
         return $this;
@@ -106,8 +110,6 @@ class DeployGenerator
 
     /**
      * Return the json of the generated deployment.
-     *
-     * @return bool|string
      */
     public function toJson(): bool|string
     {
@@ -116,14 +118,27 @@ class DeployGenerator
             'name' => $this->projectName,
             'repo' => $this->projectRepo,
             'servers' => $this->servers,
-            'commands' => $this->commands
+            'commands' => $this->commands,
         ], JSON_PRETTY_PRINT);
     }
 
     /**
+     * Returns the Yaml of the generated deployment.
+     */
+    public function toYaml(): string
+    {
+        $yaml = yaml_emit([
+            'name' => $this->projectName,
+            'repo' => $this->projectRepo,
+            'servers' => $this->servers,
+            'commands' => $this->commands,
+        ]);
+
+        return preg_replace('/^(  +)/m', '$1$1', $yaml);
+    }
+
+    /**
      * Return the array of the generated deployment.
-     *
-     * @return array
      */
     public function toArray(): array
     {
@@ -131,7 +146,7 @@ class DeployGenerator
             'name' => $this->projectName,
             'repo' => $this->projectRepo,
             'servers' => $this->servers,
-            'commands' => $this->commands
+            'commands' => $this->commands,
         ];
     }
 }

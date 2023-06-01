@@ -2,7 +2,7 @@
 
 namespace App\Commands;
 
-use App\Json\DeployGenerator;
+use App\Deployment\DeployGenerator;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\File;
 use LaravelZero\Framework\Commands\Command;
@@ -34,15 +34,15 @@ class InitializationCommand extends Command
     {
         $checkForJsonFile = File::exists('deploy.json');
 
-        if($checkForJsonFile){
+        if ($checkForJsonFile) {
             $this->info('Deployment File already exists.');
             $makeNewOne = $this->confirm('Would you like to recreate file?');
-            if($makeNewOne){
+            if ($makeNewOne) {
                 File::delete('deploy.json');
                 $this->info('Removed deploy.json');
-            }
-            else{
+            } else {
                 $this->info('Exiting');
+
                 return Command::SUCCESS;
             }
         }
@@ -51,14 +51,12 @@ class InitializationCommand extends Command
         $folderName = basename(getcwd());
 
         // Check if the project is a git repo, and get origin if it is.
-        if(is_dir(getcwd() . '/.git')){
+        if (is_dir(getcwd().'/.git')) {
             $origin = shell_exec('git config --get remote.origin.url');
             $origin = trim($origin);
-        }
-        else{
+        } else {
             $origin = null;
         }
-
 
         $projectName = $this->ask('Project Name', $folderName);
 
@@ -68,10 +66,9 @@ class InitializationCommand extends Command
 
         $generator->defaultServers();
 
-        if($this->option('laravel')){
+        if ($this->option('laravel')) {
             $generator->laravelCommands();
-        }
-        else{
+        } else {
             $generator->defaultCommands();
         }
 
@@ -84,7 +81,7 @@ class InitializationCommand extends Command
 
         $this->info('deploy.json created successfully.');
 
-        if($this->option('gitignore')){
+        if ($this->option('gitignore')) {
             $this->info('Adding deploy.json to .gitignore');
             File::append('.gitignore', 'deploy.json');
         }
@@ -94,9 +91,6 @@ class InitializationCommand extends Command
 
     /**
      * Define the command's schedule.
-     *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
-     * @return void
      */
     public function schedule(Schedule $schedule): void
     {

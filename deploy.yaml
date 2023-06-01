@@ -1,0 +1,34 @@
+---
+name: ecdeploy
+repo: git@github.com:elijahcruz12/ecdeploy.git
+servers:
+- name: Server 1
+    host: ""
+    user: ""
+    port: 22
+    tags:
+    - production
+    path: ~/ecdeploy
+    commands:
+    - before
+    - during
+    - after
+commands:
+    before:
+    - php artisan down
+    - php artisan optimize:clear
+    - git pull origin master
+    - composer install --no-interaction --prefer-dist --no-dev --optimize-autoloader
+    during:
+    - php artisan migrate --force
+    - php artisan config:cache
+    - php artisan route:cache
+    - php artisan view:cache
+    after:
+    - php artisan up
+    queue:
+    - php artisan queue:restart
+    node:
+    - npm install
+    - npm run prod
+
