@@ -2,6 +2,8 @@
 
 Deploy your project onto multiple servers with ease.
 
+![GitHub issues](https://img.shields.io/github/issues/elijahcruz12/ecdeploy) ![Packagist Downloads](https://img.shields.io/packagist/dm/elijahcruz/ecdeployer) ![Packagist PHP Version](https://img.shields.io/packagist/dependency-v/elijahcruz/ecdeployer/php)
+
 ## Installation
 
 To install, all it takes is a simple composer require
@@ -21,6 +23,8 @@ You can use the init command to create a new deploy.json file in your project.
 ```bash
 ecdeploy init
 ```
+
+Note that if a deploy.json file already exists, it will as if you want it to be overwritten.
 
 If you add `--laravel` it will create a deploy.json file with the default laravel configuration.
 
