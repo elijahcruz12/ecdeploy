@@ -76,6 +76,17 @@ class InitializationCommand extends Command
                     'path' => '~/' . $projectName,
                     'commands' => ['before', 'during', 'after']
                 ],
+                [
+                    'name' => 'Server 2',
+                    'host' => '',
+                    'user' => '',
+                    'port' => 22,
+                    'tags' => [
+                        'production'
+                    ],
+                    'path' => '~/' . $projectName,
+                    'commands' => ['before', 'during', 'after']
+                ]
             ],
             'commands' => [
                 'before' => [],

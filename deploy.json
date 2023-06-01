@@ -1,0 +1,50 @@
+{
+    "name": "ecdeploy",
+    "repo": "git@github.com:elijahcruz12/ecdeploy.git",
+    "servers": [
+        {
+            "name": "Server 1",
+            "host": "144.202.119.40",
+            "user": "forge",
+            "port": 22,
+            "tags": [
+                "production"
+            ],
+            "path": "~/ecdeploy",
+            "commands": [
+                "before",
+                "during",
+                "after"
+            ]
+        },
+        {
+            "name": "Server 2",
+            "host": "",
+            "user": "",
+            "port": 22,
+            "tags": [
+                "production"
+            ],
+            "path": "~/ecdeploy",
+            "commands": [
+                "before",
+                "during",
+                "after"
+            ]
+        }
+    ],
+    "commands": {
+        "before": [
+            "echo 'before'"
+        ],
+        "during": [
+            "echo 'during'"
+        ],
+        "after": [
+            "echo 'after'"
+        ],
+        "extra": [
+            "echo 'extra'"
+        ]
+    }
+}
