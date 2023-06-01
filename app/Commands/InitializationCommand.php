@@ -50,6 +50,7 @@ class InitializationCommand extends Command
         // Check if the project is a git repo, and get origin if it is.
         if(is_dir(getcwd() . '/.git')){
             $origin = shell_exec('git config --get remote.origin.url');
+            $origin = trim($origin);
         }
         else{
             $origin = null;
@@ -60,7 +61,41 @@ class InitializationCommand extends Command
 
         $projectRepo = $this->ask('Project Git Repo URL', $origin);
 
+        $array = [
+            'name' => $projectName,
+            'repo' => $projectRepo,
+            'servers' => [
+                [
+                    'name' => 'Server 1',
+                    'host' => '',
+                    'user' => '',
+                    'port' => 22,
+                    'tags' => [
+                        'production'
+                    ],
+                    'path' => '~/' . $projectName,
+                    'commands' => ['before', 'during', 'after']
+                ],
+            ],
+            'commands' => [
+                'before' => [],
+                'during' => [],
+                'after' => [],
+                'extra' => []
+            ]
 
+        ];
+
+        $json = json_encode($array, JSON_PRETTY_PRINT);
+
+        // Remove \/ and replace with /
+        $json = str_replace('\/', '/', $json);
+
+        File::put('deploy.json', $json);
+
+        $this->info('deploy.json created successfully.');
+
+        return Command::SUCCESS;
     }
 
     /**
