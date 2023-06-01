@@ -135,6 +135,7 @@ class DeployCommand extends Command
 
             $process = Ssh::create($server['user'], $server['host'], $server['port'] ?? 22)
                 ->usePrivateKey(getenv('HOME') . '/.ssh/id_rsa')
+                ->disablePasswordAuthentication()
                 ->onOutput(function($type, $line) {
                     $this->line($line);
                 })
