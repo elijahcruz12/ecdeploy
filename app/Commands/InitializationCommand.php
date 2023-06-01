@@ -2,6 +2,7 @@
 
 namespace App\Commands;
 
+use App\Json\DeployGenerator;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\File;
 use LaravelZero\Framework\Commands\Command;
@@ -13,7 +14,9 @@ class InitializationCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'init';
+    protected $signature = 'init
+    {--laravel : Created a laravel based deploy.json}
+    {--gitignore : Add deploy.json to .gitignore}';
 
     /**
      * The description of the command.
@@ -61,43 +64,18 @@ class InitializationCommand extends Command
 
         $projectRepo = $this->ask('Project Git Repo URL', $origin);
 
-        $array = [
-            'name' => $projectName,
-            'repo' => $projectRepo,
-            'servers' => [
-                [
-                    'name' => 'Server 1',
-                    'host' => '',
-                    'user' => '',
-                    'port' => 22,
-                    'tags' => [
-                        'production'
-                    ],
-                    'path' => '~/' . $projectName,
-                    'commands' => ['before', 'during', 'after']
-                ],
-                [
-                    'name' => 'Server 2',
-                    'host' => '',
-                    'user' => '',
-                    'port' => 22,
-                    'tags' => [
-                        'production'
-                    ],
-                    'path' => '~/' . $projectName,
-                    'commands' => ['before', 'during', 'after']
-                ]
-            ],
-            'commands' => [
-                'before' => [],
-                'during' => [],
-                'after' => [],
-                'extra' => []
-            ]
+        $generator = new DeployGenerator($projectName, $projectRepo);
 
-        ];
+        $generator->defaultServers();
 
-        $json = json_encode($array, JSON_PRETTY_PRINT);
+        if($this->option('laravel')){
+            $generator->laravelCommands();
+        }
+        else{
+            $generator->defaultCommands();
+        }
+
+        $json = $generator->toJson();
 
         // Remove \/ and replace with /
         $json = str_replace('\/', '/', $json);
@@ -105,6 +83,11 @@ class InitializationCommand extends Command
         File::put('deploy.json', $json);
 
         $this->info('deploy.json created successfully.');
+
+        if($this->option('gitignore')){
+            $this->info('Adding deploy.json to .gitignore');
+            File::append('.gitignore', 'deploy.json');
+        }
 
         return Command::SUCCESS;
     }
