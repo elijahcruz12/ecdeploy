@@ -1,40 +1,131 @@
-<a href="https://supportukrainenow.org/"><img src="https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner-direct.svg" width="100%"></a>
+# ECDeploy
 
-------
+Deploy your project onto multiple servers with ease.
 
-<p align="center">
-    <img title="Laravel Zero" height="100" src="https://raw.githubusercontent.com/laravel-zero/docs/master/images/logo/laravel-zero-readme.png" />
-</p>
+## Installation
 
-<p align="center">
-  <a href="https://github.com/laravel-zero/framework/actions"><img src="https://github.com/laravel-zero/laravel-zero/actions/workflows/tests.yml/badge.svg" alt="Build Status"></img></a>
-  <a href="https://packagist.org/packages/laravel-zero/framework"><img src="https://img.shields.io/packagist/dt/laravel-zero/framework.svg" alt="Total Downloads"></a>
-  <a href="https://packagist.org/packages/laravel-zero/framework"><img src="https://img.shields.io/packagist/v/laravel-zero/framework.svg?label=stable" alt="Latest Stable Version"></a>
-  <a href="https://packagist.org/packages/laravel-zero/framework"><img src="https://img.shields.io/packagist/l/laravel-zero/framework.svg" alt="License"></a>
-</p>
+To install, all it takes is a simple composer require
 
-<h4> <center>This is a <bold>community project</bold> and not an official Laravel one </center></h4>
+```bash
+composer global require elijahcruz/ecdeployer
+```
 
-Laravel Zero was created by [Nuno Maduro](https://github.com/nunomaduro) and [Owen Voke](https://github.com/owenvoke), and is a micro-framework that provides an elegant starting point for your console application. It is an **unofficial** and customized version of Laravel optimized for building command-line applications.
+## Usage
 
-- Built on top of the [Laravel](https://laravel.com) components.
-- Optional installation of Laravel [Eloquent](https://laravel-zero.com/docs/database/), Laravel [Logging](https://laravel-zero.com/docs/logging/) and many others.
-- Supports interactive [menus](https://laravel-zero.com/docs/build-interactive-menus/) and [desktop notifications](https://laravel-zero.com/docs/send-desktop-notifications/) on Linux, Windows & MacOS.
-- Ships with a [Scheduler](https://laravel-zero.com/docs/task-scheduling/) and  a [Standalone Compiler](https://laravel-zero.com/docs/build-a-standalone-application/).
-- Integration with [Collision](https://github.com/nunomaduro/collision) - Beautiful error reporting
+## Commands
 
-------
+### Init
 
-## Documentation
+You can use the init command to create a new deploy.json file in your project.
 
-For full documentation, visit [laravel-zero.com](https://laravel-zero.com/).
+```bash
+ecdeploy init
+```
 
-## Support the development
-**Do you like this project? Support it by donating**
+If you add `--laravel` it will create a deploy.json file with the default laravel configuration.
 
-- PayPal: [Donate](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=66BYDWAT92N6L)
-- Patreon: [Donate](https://www.patreon.com/nunomaduro)
+If you add `--gitignore` it will add the deploy.json file to your .gitignore file.
+
+### Deploy
+
+You can use the deploy command to deploy your project to your servers.
+
+```bash
+ecdeploy deploy
+```
+
+Using `--all` will deploy to all servers.
+
+Using `--tags` will deploy to all servers with the specified tags.
+
+If you don't select any options, it will prompt you to select which servers you want to deploy to. You can select multiple servers by separating them with a comma.
+
+## Configuration
+
+### deploy.json
+
+The deploy.json file is where you configure your servers and your project.
+
+```json
+
+{
+    "name": "myproject",
+    "repo": "git@github.com:myproject/myproject.git",
+    "servers": [
+        {
+            "name": "prod-server",
+            "host": "192.168.1.1",
+            "user": "root",
+            "port": 22,
+            "tags": [
+                "prod"
+            ],
+            "path": "~/myproject",
+            "commands": [
+                "before",
+                "during",
+                "after"
+                "node",
+            ]
+        }
+    ],
+    "commands": {
+        "before": [
+            "php artisan down",
+            "php artisan optimize:clear",
+            "git pull origin master",
+            "composer install --no-interaction --prefer-dist --no-dev --optimize-autoloader"
+        ],
+        "queue-pause": [
+            "php artisan horizon:pause"
+        ],
+        "during": [
+            "php artisan migrate --force",
+            "php artisan config:cache",
+            "php artisan route:cache",
+            "php artisan view:cache"
+        ],
+        "node": [
+            "npm install",
+            "npm run build"
+        ],
+        "after": [
+            "php artisan up"
+        ],
+        "queue-resume": [
+            "php artisan horizon:continue"
+        ]
+    }
+}
+
+
+```
+
+### Servers
+
+All servers are defined in the servers array. Each server has the following properties:
+- Name: The name of the server
+- Host: The IP address or domain of the server
+- User: The user to connect to the server with
+- Port: The port to connect to the server with
+- Tags: An array of tags to identify the server with.
+- Path: The path to the project on the server
+- Commands: An array of the command stages to run on the server
+
+### Commands
+
+All commands are defined in stages. The stages are run in the order they are defined in the commands array. So in the example above, `node` will run before `after`, even though `after` is defined before `node` in the server's command array.
+
+The stages names can be anything you want, and you can have as many stages as you want. The only exception is the `node` stage.
+
+You also don't need to create the path on the server, it will be created automatically if it doesn't exist.
+
+
+## Contributing
+
+Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
+
 
 ## License
 
-Laravel Zero is an open-source software licensed under the MIT license.
+The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
