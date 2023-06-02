@@ -4,6 +4,15 @@ Deploy your project onto multiple servers with ease.
 
 ![GitHub issues](https://img.shields.io/github/issues/elijahcruz12/ecdeploy) ![Packagist Downloads](https://img.shields.io/packagist/dm/elijahcruz/ecdeployer) ![Packagist PHP Version](https://img.shields.io/packagist/dependency-v/elijahcruz/ecdeployer/php)
 
+## Requirements
+
+- PHP 8.0 or higher
+- Composer
+- SSH access to your servers
+- OpenSSL PHP Extension
+- YAML PHP Extension
+- We're assuming you have an SSH key at `~/.ssh/id_rsa`.
+
 ## Installation
 
 To install, all it takes is a simple composer require
