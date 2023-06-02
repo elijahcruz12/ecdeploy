@@ -43,7 +43,7 @@ If you add `--format=` you can then choose between a json or a yaml file.
 
 ### Deploy
 
-You can use the deploy command to deploy your project to your servers.
+You can use the deployment command to deploy your project to your servers.
 
 ```bash
 ecdeploy deploy
@@ -57,11 +57,11 @@ If you don't select any options, it will prompt you to select which servers you 
 
 ### Encryption
 
-You can encrypt and decrypt your deploy file using the `encrypt` and `decrypt` commands.
+You can encrypt and decrypt your deployment file using the `encrypt` and `decrypt` commands.
 
-These will create a new file with the extension `.enc` in the same directory as the deploy file.
+These will create a new file with the extension `.enc` in the same directory as the deployment file.
 
-If you add `--remove` it will remove the original file if you are using `encrypt`, and it will remove the encrpyted file if you're using `decrypt`.
+If you add `--remove` it will remove the original file if you are using `encrypt`, and it will remove the encrypted file if you're using `decrypt`.
 
 ## Configuration
 
@@ -87,8 +87,8 @@ The deploy.json file is where you configure your servers and your project.
             "commands": [
                 "before",
                 "during",
-                "after"
-                "node",
+                "after",
+                "node"
             ]
         }
     ],
