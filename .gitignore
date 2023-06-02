@@ -3,3 +3,9 @@
 /.vscode
 /.vagrant
 .phpunit.result.cache
+deploy.json
+deploy.json.enc
+deploy.yaml
+deploy.yaml.enc
+deploy.php
+deploy.php.enc
