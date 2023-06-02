@@ -13,4 +13,6 @@ interface DeploymentInterface
     public function getCommandsForServer(array $server): array;
 
     public static function exists(): bool;
+
+    public static function encryptedFileExists(): bool;
 }

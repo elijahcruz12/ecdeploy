@@ -97,4 +97,9 @@ class YamlDeployment implements DeploymentInterface
 
         return $errors;
     }
+
+    public static function encryptedFileExists(): bool
+    {
+        return File::exists(getcwd().'/deploy.yaml.enc');
+    }
 }

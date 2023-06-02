@@ -101,4 +101,9 @@ class JsonDeployment implements DeploymentInterface
 
         return $errors;
     }
+
+    public static function encryptedFileExists(): bool
+    {
+        return File::exists(getcwd().'/deploy.json.enc');
+    }
 }
