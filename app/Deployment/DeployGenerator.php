@@ -138,8 +138,8 @@ class DeployGenerator
             'commands' => $this->commands,
         ];
 
-
         $yaml = Yaml::dump($array);
+
         return preg_replace('/^(  +)/m', '$1$1', $yaml);
     }
 

@@ -75,14 +75,13 @@ class InitializationCommand extends Command
             $generator->defaultCommands();
         }
 
-        if($this->option('format') == 'yaml'){
+        if ($this->option('format') == 'yaml') {
             $yaml = $generator->toYaml();
 
             File::put('deploy.yaml', $yaml);
 
             $this->info('deploy.yaml created successfully.');
-        }
-        elseif($this->option('format') == 'json'){
+        } elseif ($this->option('format') == 'json') {
             $json = $generator->toJson();
 
             // Remove \/ and replace with /
@@ -91,9 +90,9 @@ class InitializationCommand extends Command
             File::put('deploy.json', $json);
 
             $this->info('deploy.json created successfully.');
-        }
-        else{
+        } else {
             $this->error('Invalid format. Please use json or yaml');
+
             return Command::FAILURE;
         }
 

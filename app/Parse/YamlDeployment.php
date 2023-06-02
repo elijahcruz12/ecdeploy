@@ -10,8 +10,11 @@ use Symfony\Component\Yaml\Yaml;
 class YamlDeployment implements DeploymentInterface
 {
     public string $projectName = '';
+
     public string|null $projectRepo = null;
+
     public Collection|null $servers = null;
+
     public Collection|null $commands = null;
 
     public static function load(): static
@@ -29,7 +32,6 @@ class YamlDeployment implements DeploymentInterface
     }
 
     /**
-     * @param array $tags
      * @return $this
      */
     public function serversByTags(array $tags): static
@@ -58,8 +60,8 @@ class YamlDeployment implements DeploymentInterface
         $serverCommands = [];
 
         foreach ($this->commands as $stage => $commands) {
-            if(in_array($stage, $stages)) {
-                foreach ($commands as $command){
+            if (in_array($stage, $stages)) {
+                foreach ($commands as $command) {
                     $serverCommands[] = $command;
                 }
             }
@@ -77,19 +79,19 @@ class YamlDeployment implements DeploymentInterface
     {
         $errors = collect();
 
-        if($this->projectName === '') {
+        if ($this->projectName === '') {
             $errors->push('Project name is required');
         }
 
-        if($this->projectRepo === null) {
+        if ($this->projectRepo === null) {
             $errors->push('Project repo is not set');
         }
 
-        if($this->servers->count() === 0) {
+        if ($this->servers->count() === 0) {
             $errors->push('No servers are defined');
         }
 
-        if($this->commands->count() === 0) {
+        if ($this->commands->count() === 0) {
             $errors->push('No commands are defined');
         }
 

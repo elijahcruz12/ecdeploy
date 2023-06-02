@@ -30,14 +30,13 @@ class ValidateCommand extends Command
      */
     public function handle()
     {
-        if(JsonDeployment::exists()){
+        if (JsonDeployment::exists()) {
             $deploy = JsonDeployment::load();
-        }
-        elseif(YamlDeployment::exists()){
+        } elseif (YamlDeployment::exists()) {
             $deploy = YamlDeployment::load();
-        }
-        else{
+        } else {
             $this->error('No deploy file found. Please run `init` to create one.');
+
             return Command::FAILURE;
         }
 
@@ -45,23 +44,22 @@ class ValidateCommand extends Command
 
         $errors = $deploy->validate();
 
-        if($errors->count() > 0){
+        if ($errors->count() > 0) {
             $this->error('The following errors were found:');
-            $errors->each(function($error){
+            $errors->each(function ($error) {
                 $this->error($error);
             });
+
             return Command::FAILURE;
         }
 
         $this->info('No errors found.');
+
         return Command::SUCCESS;
     }
 
     /**
      * Define the command's schedule.
-     *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
-     * @return void
      */
     public function schedule(Schedule $schedule): void
     {

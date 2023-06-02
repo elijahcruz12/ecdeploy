@@ -2,12 +2,10 @@
 
 namespace App\Interfaces\Deployments;
 
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\File;
-
 interface DeploymentInterface
 {
     public static function load(): static;
+
     public function serversByTags(array $tags): static;
 
     public function serversByName(array $names): static;

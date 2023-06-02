@@ -7,9 +7,11 @@ use Illuminate\Support\Collection;
 class Deployment
 {
     public string $name;
+
     public string|null $repo = null;
 
     public Collection $servers;
+
     public Collection $commands;
 
     public function __construct($name, $repo, $servers, $commands)
@@ -46,8 +48,8 @@ class Deployment
         $serverCommands = [];
 
         foreach ($this->commands as $stage => $commands) {
-            if(in_array($stage, $stages)) {
-                foreach ($commands as $command){
+            if (in_array($stage, $stages)) {
+                foreach ($commands as $command) {
                     $serverCommands[] = $command;
                 }
             }

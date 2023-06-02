@@ -5,7 +5,6 @@ namespace App\Commands;
 use App\Parse\JsonDeployment;
 use App\Parse\YamlDeployment;
 use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use LaravelZero\Framework\Commands\Command;
 use Spatie\Ssh\Ssh;
@@ -39,14 +38,13 @@ class DeployCommand extends Command
         $all = $this->option('all');
 
         // We'll assume json file is in the root of the project
-        if(JsonDeployment::exists()){
+        if (JsonDeployment::exists()) {
             $deploy = JsonDeployment::load();
-        }
-        elseif(YamlDeployment::exists()){
+        } elseif (YamlDeployment::exists()) {
             $deploy = YamlDeployment::load();
-        }
-        else{
+        } else {
             $this->error('No deploy file found. Please run `init` to create one.');
+
             return Command::FAILURE;
         }
 
