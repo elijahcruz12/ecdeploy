@@ -47,6 +47,18 @@ class EncryptCommand extends Command
 
         $password = $this->option('password') ?? $this->secret('Enter a password to encrypt the file with.');
 
+        if ($password === false || $password === '' || $password === null) {
+            $this->error('Password cannot be empty.');
+
+            return Command::FAILURE;
+        }
+
+        if (strlen($password) < 8) {
+            $this->error('Password must be at least 8 characters long.');
+
+            return Command::FAILURE;
+        }
+
         if (! $this->option('password')) {
             $confirm = $this->secret('Confirm the password.');
 
