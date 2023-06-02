@@ -3,6 +3,7 @@
 namespace App\Commands;
 
 use App\Parse\JsonDeployment;
+use App\Parse\PhpDeployment;
 use App\Parse\YamlDeployment;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\File;
@@ -63,6 +64,18 @@ class DeployCommand extends Command
 
             $deploy = YamlDeployment::loadEncryptedFile($password);
 
+        } elseif (PhpDeployment::exists()) {
+            $deploy = PhpDeployment::load();
+        } elseif (PhpDeployment::encryptedFileExists()) {
+            $password = $this->secret('Enter the password to decrypt the file.');
+
+            if (PhpDeployment::validatePassword($password) === false) {
+                $this->error('Incorrect password.');
+
+                return Command::FAILURE;
+            }
+
+            $deploy = PhpDeployment::loadEncryptedFile($password);
         } else {
             $this->error('No deploy file found. Please run `init` to create one.');
 
@@ -95,7 +108,7 @@ class DeployCommand extends Command
                 ->usePrivateKey(getenv('HOME').'/.ssh/id_rsa')
                 ->disablePasswordAuthentication()
                 ->onOutput(function ($type, $line) {
-                    $this->line($line);
+                    $this->output->write($line);
                 })
                 ->execute($deploy->getCommandsForServer($server));
 

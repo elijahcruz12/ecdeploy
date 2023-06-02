@@ -6,7 +6,7 @@ Deploy your project onto multiple servers with ease.
 
 ## Requirements
 
-- PHP 8.0 or higher
+- PHP 8.1 or higher
 - Composer
 - SSH access to your servers
 - OpenSSL PHP Extension
@@ -39,7 +39,7 @@ If you add `--laravel` it will create a deploy.json file with the default larave
 
 If you add `--gitignore` it will add the deploy.json file to your .gitignore file.
 
-If you add `--format=` you can then choose between a json or a yaml file.
+If you add `--format=` you can then choose between a json, php or a yaml file.
 
 ### Deploy
 

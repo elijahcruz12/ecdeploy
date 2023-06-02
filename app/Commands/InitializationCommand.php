@@ -19,7 +19,7 @@ class InitializationCommand extends Command
     protected $signature = 'init
     {--laravel : Created a laravel based deploy.json}
     {--gitignore : Add deploy.json to .gitignore}
-    {--format=json : What format you want the deploy file to be in. Options: json, yaml}';
+    {--format=json : What format you want the deploy file to be in. Options: json, yaml, php}';
 
     /**
      * The description of the command.
@@ -90,6 +90,14 @@ class InitializationCommand extends Command
             File::put('deploy.json', $json);
 
             $this->info('deploy.json created successfully.');
+        } elseif ($this->option('format') == 'php') {
+            $php = $generator->toFileArray();
+
+            $output = "<?php\n\nreturn ".$php.";\n";
+
+            File::put('deploy.php', $php);
+
+            $this->info('deploy.php created successfully.');
         } else {
             $this->error('Invalid format. Please use json or yaml');
 

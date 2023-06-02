@@ -14,12 +14,12 @@ class Deployment
 
     public Collection $commands;
 
-    public function __construct($name, $repo, $servers, $commands)
+    public function __construct(array $deployment)
     {
-        $this->name = $name;
-        $this->repo = $repo;
-        $this->servers = $servers;
-        $this->commands = $commands;
+        $this->name = $deployment['name'];
+        $this->repo = $deployment['repo'];
+        $this->servers = collect($deployment['servers']);
+        $this->commands = collect($deployment['commands']);
     }
 
     public function serversByTags(array $tags): static
