@@ -3,6 +3,8 @@
 namespace App\Commands;
 
 use App\Deployment\DeployGenerator;
+use App\Parse\JsonDeployment;
+use App\Parse\YamlDeployment;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\File;
 use LaravelZero\Framework\Commands\Command;
@@ -16,7 +18,8 @@ class InitializationCommand extends Command
      */
     protected $signature = 'init
     {--laravel : Created a laravel based deploy.json}
-    {--gitignore : Add deploy.json to .gitignore}';
+    {--gitignore : Add deploy.json to .gitignore}
+    {--format=json : What format you want the deploy file to be in. Options: json, yaml}';
 
     /**
      * The description of the command.
@@ -32,14 +35,14 @@ class InitializationCommand extends Command
      */
     public function handle()
     {
-        $checkForJsonFile = File::exists('deploy.json');
 
-        if ($checkForJsonFile) {
+        if (JsonDeployment::exists() || YamlDeployment::exists()) {
             $this->info('Deployment File already exists.');
             $makeNewOne = $this->confirm('Would you like to recreate file?');
             if ($makeNewOne) {
                 File::delete('deploy.json');
-                $this->info('Removed deploy.json');
+                File::delete('deploy.yaml');
+                $this->info('Removed Deployment File');
             } else {
                 $this->info('Exiting');
 
@@ -72,18 +75,33 @@ class InitializationCommand extends Command
             $generator->defaultCommands();
         }
 
-        $json = $generator->toJson();
+        if($this->option('format') == 'yaml'){
+            $yaml = $generator->toYaml();
 
-        // Remove \/ and replace with /
-        $json = str_replace('\/', '/', $json);
+            File::put('deploy.yaml', $yaml);
 
-        File::put('deploy.json', $json);
+            $this->info('deploy.yaml created successfully.');
+        }
+        elseif($this->option('format') == 'json'){
+            $json = $generator->toJson();
 
-        $this->info('deploy.json created successfully.');
+            // Remove \/ and replace with /
+            $json = str_replace('\/', '/', $json);
+
+            File::put('deploy.json', $json);
+
+            $this->info('deploy.json created successfully.');
+        }
+        else{
+            $this->error('Invalid format. Please use json or yaml');
+            return Command::FAILURE;
+        }
 
         if ($this->option('gitignore')) {
             $this->info('Adding deploy.json to .gitignore');
             File::append('.gitignore', 'deploy.json');
+            $this->info('Adding deploy.yaml to .gitignore');
+            File::append('.gitignore', 'deploy.yaml');
         }
 
         return Command::SUCCESS;

@@ -2,6 +2,8 @@
 
 namespace App\Deployment;
 
+use Symfony\Component\Yaml\Yaml;
+
 class DeployGenerator
 {
     public string $projectName;
@@ -115,6 +117,7 @@ class DeployGenerator
     {
 
         return json_encode([
+            'version' => 1,
             'name' => $this->projectName,
             'repo' => $this->projectRepo,
             'servers' => $this->servers,
@@ -127,13 +130,16 @@ class DeployGenerator
      */
     public function toYaml(): string
     {
-        $yaml = yaml_emit([
+        $array = [
+            'version' => 1,
             'name' => $this->projectName,
             'repo' => $this->projectRepo,
             'servers' => $this->servers,
             'commands' => $this->commands,
-        ]);
+        ];
 
+
+        $yaml = Yaml::dump($array);
         return preg_replace('/^(  +)/m', '$1$1', $yaml);
     }
 
