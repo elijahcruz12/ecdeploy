@@ -106,4 +106,27 @@ class JsonDeployment implements DeploymentInterface
     {
         return File::exists(getcwd().'/deploy.json.enc');
     }
+
+    public static function loadEncryptedFile(string $password): static
+    {
+        $data = openssl_decrypt(file_get_contents(getcwd().'/deploy.json.env'), 'aes-256-cbc', $password, 0, substr(hash('sha256', 'deploy'), 0, 16));
+
+        $deploy = json_decode($data, true);
+
+        $class = new self();
+
+        $class->projectName = $deploy['projectName'];
+        $class->projectRepo = $deploy['projectRepo'] ?? null;
+        $class->servers = collect($deploy['servers']);
+        $class->commands = collect($deploy['commands']);
+
+        return $class;
+    }
+
+    public static function validatePassword(string $password): bool
+    {
+        $data = openssl_decrypt(file_get_contents(getcwd().'/deploy.json.env'), 'aes-256-cbc', $password, 0, substr(hash('sha256', 'deploy'), 0, 16));
+
+        return ! ($data == false);
+    }
 }

@@ -33,26 +33,26 @@ class EncryptCommand extends Command
      */
     public function handle()
     {
-        if(JsonDeployment::exists()){
+        if (JsonDeployment::exists()) {
             $file = getcwd().'/deploy.json';
             $encFile = getcwd().'/deploy.json.enc';
-        }
-        elseif(YamlDeployment::exists()){
+        } elseif (YamlDeployment::exists()) {
             $file = getcwd().'/deploy.yaml';
             $encFile = getcwd().'/deploy.yaml.enc';
-        }
-        else{
+        } else {
             $this->error('No deployment file found.');
+
             return Command::FAILURE;
         }
 
         $password = $this->option('password') ?? $this->secret('Enter a password to encrypt the file with.');
 
-        if(!$this->option('password')){
+        if (! $this->option('password')) {
             $confirm = $this->secret('Confirm the password.');
 
-            if($password !== $confirm){
+            if ($password !== $confirm) {
                 $this->error('Passwords do not match.');
+
                 return Command::FAILURE;
             }
         }
@@ -61,7 +61,7 @@ class EncryptCommand extends Command
 
         File::put($encFile, $encrypted);
 
-        if($this->option('remove')){
+        if ($this->option('remove')) {
             File::delete($file);
         }
 
@@ -72,9 +72,6 @@ class EncryptCommand extends Command
 
     /**
      * Define the command's schedule.
-     *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
-     * @return void
      */
     public function schedule(Schedule $schedule): void
     {

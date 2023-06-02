@@ -33,16 +33,15 @@ class DecryptCommand extends Command
      */
     public function handle()
     {
-        if(JsonDeployment::encryptedFileExists()){
+        if (JsonDeployment::encryptedFileExists()) {
             $file = getcwd().'/deploy.json';
             $encFile = getcwd().'/deploy.json.enc';
-        }
-        elseif(YamlDeployment::encryptedFileExists()){
+        } elseif (YamlDeployment::encryptedFileExists()) {
             $file = getcwd().'/deploy.yaml';
             $encFile = getcwd().'/deploy.yaml.enc';
-        }
-        else{
+        } else {
             $this->error('No deployment file found.');
+
             return Command::FAILURE;
         }
 
@@ -50,14 +49,15 @@ class DecryptCommand extends Command
 
         $data = openssl_decrypt(file_get_contents($encFile), 'aes-256-cbc', $password, 0, substr(hash('sha256', 'deploy'), 0, 16));
 
-        if($data === false){
+        if ($data === false) {
             $this->error('Incorrect password.');
+
             return Command::FAILURE;
         }
 
         File::put($file, $data);
 
-        if($this->option('remove')){
+        if ($this->option('remove')) {
             File::delete($encFile);
         }
 
@@ -68,9 +68,6 @@ class DecryptCommand extends Command
 
     /**
      * Define the command's schedule.
-     *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
-     * @return void
      */
     public function schedule(Schedule $schedule): void
     {

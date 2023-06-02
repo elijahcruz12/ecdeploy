@@ -20,7 +20,8 @@
         "ext-yaml": "*",
         "nunomaduro/termwind": "^1.15.1",
         "spatie/ssh": "^1.9",
-        "symfony/yaml": "^6.3"
+        "symfony/yaml": "^6.3",
+        "ext-openssl": "*"
     },
     "require-dev": {
         "laravel/pint": "^1.10",

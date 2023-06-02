@@ -42,6 +42,27 @@ class DeployCommand extends Command
             $deploy = JsonDeployment::load();
         } elseif (YamlDeployment::exists()) {
             $deploy = YamlDeployment::load();
+        } elseif (JsonDeployment::encryptedFileExists()) {
+            $password = $this->secret('Enter the password to decrypt the file.');
+
+            if (JsonDeployment::validatePassword($password) === false) {
+                $this->error('Incorrect password.');
+
+                return Command::FAILURE;
+            }
+
+            $deploy = JsonDeployment::loadEncryptedFile($password);
+        } elseif (YamlDeployment::encryptedFileExists()) {
+            $password = $this->secret('Enter the password to decrypt the file.');
+
+            if (YamlDeployment::validatePassword($password) === false) {
+                $this->error('Incorrect password.');
+
+                return Command::FAILURE;
+            }
+
+            $deploy = YamlDeployment::loadEncryptedFile($password);
+
         } else {
             $this->error('No deploy file found. Please run `init` to create one.');
 
