@@ -3,11 +3,10 @@
 namespace App\Parse;
 
 use App\Interfaces\Deployments\DeploymentInterface;
+use App\Models\Deployment;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\File;
-use Symfony\Component\Yaml\Yaml;
 
-class YamlDeployment implements DeploymentInterface
+class PhpDeployment implements DeploymentInterface
 {
     public string $projectName = '';
 
@@ -19,21 +18,23 @@ class YamlDeployment implements DeploymentInterface
 
     public static function load(): static
     {
-        $yaml = Yaml::parseFile(getcwd().'/deploy.yaml');
+        // Get the deploy.php file
+        $deploy = require getcwd().'/deploy.php';
+
+        // The deploy.php file is a PHP file that returns an array
+        // of the deployment configuration. We can use this to create a new instance
+        // of this class.
 
         $class = new self();
 
-        $class->projectName = $yaml['name'];
-        $class->projectRepo = $yaml['repo'] ?? null;
-        $class->servers = collect($yaml['servers']);
-        $class->commands = collect($yaml['commands']);
+        $class->projectName = $deploy['name'];
+        $class->projectRepo = $deploy['repo'] ?? null;
+        $class->servers = collect($deploy['servers']);
+        $class->commands = collect($deploy['commands']);
 
         return $class;
     }
 
-    /**
-     * @return $this
-     */
     public function serversByTags(array $tags): static
     {
 
@@ -72,56 +73,34 @@ class YamlDeployment implements DeploymentInterface
 
     public static function exists(): bool
     {
-        return File::exists(getcwd().'/deploy.yaml');
-    }
-
-    public function validate()
-    {
-        $errors = collect();
-
-        if ($this->projectName === '') {
-            $errors->push('Project name is required');
-        }
-
-        if ($this->projectRepo === null) {
-            $errors->push('Project repo is not set');
-        }
-
-        if ($this->servers->count() === 0) {
-            $errors->push('No servers are defined');
-        }
-
-        if ($this->commands->count() === 0) {
-            $errors->push('No commands are defined');
-        }
-
-        return $errors;
+        return file_exists(getcwd().'/deploy.php');
     }
 
     public static function encryptedFileExists(): bool
     {
-        return File::exists(getcwd().'/deploy.yaml.enc');
+        return file_exists(getcwd().'/deploy.php.enc');
     }
 
     public static function loadEncryptedFile(string $password): static
     {
-        $data = openssl_decrypt(file_get_contents(getcwd().'/deploy.yaml.enc'), 'aes-256-cbc', $password, 0, substr(hash('sha256', 'deploy'), 0, 16));
+        $data = openssl_decrypt(file_get_contents(getcwd().'/deploy.php.enc'), 'aes-256-cbc', $password, 0, substr(hash('sha256', 'deploy'), 0, 16));
 
-        $yaml = Yaml::parse($data);
+        $deploy = require getcwd().'/deploy.php.enc';
+
+        // The deploy.php file is a PHP file that returns an array
+        // of the deployment configuration. We can use this to create a new instance
+        // of this class.
 
         $class = new self();
 
-        $class->projectName = $yaml['name'];
-        $class->projectRepo = $yaml['repo'] ?? null;
-        $class->servers = collect($yaml['servers']);
-        $class->commands = collect($yaml['commands']);
+        $class->deployment = new Deployment($deploy);
 
         return $class;
     }
 
     public static function validatePassword(string $password): bool
     {
-        $data = openssl_decrypt(file_get_contents(getcwd().'/deploy.yaml.enc'), 'aes-256-cbc', $password, 0, substr(hash('sha256', 'deploy'), 0, 16));
+        $data = openssl_decrypt(file_get_contents(getcwd().'/deploy.php.enc'), 'aes-256-cbc', $password, 0, substr(hash('sha256', 'deploy'), 0, 16));
 
         return ! ($data == false);
     }

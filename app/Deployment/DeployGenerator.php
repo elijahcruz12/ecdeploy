@@ -36,8 +36,8 @@ class DeployGenerator
         $this->servers = [
             [
                 'name' => 'Server 1',
-                'host' => '',
                 'user' => '',
+                'host' => '',
                 'port' => 22,
                 'tags' => [
                     'production',
@@ -154,5 +154,29 @@ class DeployGenerator
             'servers' => $this->servers,
             'commands' => $this->commands,
         ];
+    }
+
+    public function toFileArray(array $array = null, string $indentation = '')
+    {
+
+        $output = '<?php'.PHP_EOL.PHP_EOL;
+        $output .= 'return ';
+
+        if ($array === null) {
+            $output .= var_export($this->toArray(), true);
+        } else {
+            $output .= var_export($array, true);
+        }
+
+        $output = str_replace('array (', '[', $output);
+        $output = str_replace(')', ']', $output);
+
+        // Find all the numeric keys and remove them
+        $output = preg_replace('/[0-9]+ => /', '', $output);
+
+        $output .= ';'.PHP_EOL;
+
+        return $output;
+
     }
 }
