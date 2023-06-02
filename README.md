@@ -30,6 +30,8 @@ If you add `--laravel` it will create a deploy.json file with the default larave
 
 If you add `--gitignore` it will add the deploy.json file to your .gitignore file.
 
+If you add `--format=` you can then choose between a json or a yaml file.
+
 ### Deploy
 
 You can use the deploy command to deploy your project to your servers.
