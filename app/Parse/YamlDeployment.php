@@ -97,4 +97,32 @@ class YamlDeployment implements DeploymentInterface
 
         return $errors;
     }
+
+    public static function encryptedFileExists(): bool
+    {
+        return File::exists(getcwd().'/deploy.yaml.enc');
+    }
+
+    public static function loadEncryptedFile(string $password): static
+    {
+        $data = openssl_decrypt(file_get_contents(getcwd().'/deploy.yaml.env'), 'aes-256-cbc', $password, 0, substr(hash('sha256', 'deploy'), 0, 16));
+
+        $yaml = Yaml::parse($data);
+
+        $class = new self();
+
+        $class->projectName = $yaml['name'];
+        $class->projectRepo = $yaml['repo'] ?? null;
+        $class->servers = collect($yaml['servers']);
+        $class->commands = collect($yaml['commands']);
+
+        return $class;
+    }
+
+    public static function validatePassword(string $password): bool
+    {
+        $data = openssl_decrypt(file_get_contents(getcwd().'/deploy.yaml.env'), 'aes-256-cbc', $password, 0, substr(hash('sha256', 'deploy'), 0, 16));
+
+        return ! ($data == false);
+    }
 }
