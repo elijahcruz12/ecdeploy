@@ -55,6 +55,14 @@ Using `--tags` will deploy to all servers with the specified tags.
 
 If you don't select any options, it will prompt you to select which servers you want to deploy to. You can select multiple servers by separating them with a comma.
 
+### Encryption
+
+You can encrypt and decrypt your deploy file using the `encrypt` and `decrypt` commands.
+
+These will create a new file with the extension `.enc` in the same directory as the deploy file.
+
+If you add `--remove` it will remove the original file if you are using `encrypt`, and it will remove the encrpyted file if you're using `decrypt`.
+
 ## Configuration
 
 ### deploy.json
