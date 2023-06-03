@@ -115,4 +115,28 @@ class PhpDeployment implements DeploymentInterface
 
         return ! ($data == false);
     }
+
+    public function validate(){
+        $errors = collect();
+
+        if (empty($this->projectName)) {
+            $errors->push('Project name is required.');
+        }
+
+        if (empty($this->projectRepo)) {
+            $errors->push('Project repo is required.');
+        }
+
+        if ($this->servers->count() == 0) {
+            $errors->push('At least one server is required.');
+        }
+
+        if(!$this->isTriggered) {
+            if ($this->commands->count() == 0) {
+                $errors->push('At least one command is required.');
+            }
+        }
+
+        return $errors;
+    }
 }

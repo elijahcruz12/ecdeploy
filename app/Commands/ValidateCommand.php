@@ -3,6 +3,7 @@
 namespace App\Commands;
 
 use App\Parse\JsonDeployment;
+use App\Parse\PhpDeployment;
 use App\Parse\YamlDeployment;
 use Illuminate\Console\Scheduling\Schedule;
 use LaravelZero\Framework\Commands\Command;
@@ -34,7 +35,11 @@ class ValidateCommand extends Command
             $deploy = JsonDeployment::load();
         } elseif (YamlDeployment::exists()) {
             $deploy = YamlDeployment::load();
-        } else {
+        } elseif (PhpDeployment::exists()){
+            $deploy = PhpDeployment::load();
+        }
+
+        else {
             $this->error('No deploy file found. Please run `init` to create one.');
 
             return Command::FAILURE;
