@@ -27,8 +27,8 @@ class JsonDeployment implements DeploymentInterface
 
         $class = new self();
 
-        $class->projectName = $deploy['projectName'];
-        $class->projectRepo = $deploy['projectRepo'] ?? null;
+        $class->projectName = $deploy['name'];
+        $class->projectRepo = $deploy['repo'] ?? null;
         $class->servers = collect($deploy['servers']);
         $class->commands = collect($deploy['commands']);
 
@@ -115,8 +115,8 @@ class JsonDeployment implements DeploymentInterface
 
         $class = new self();
 
-        $class->projectName = $deploy['projectName'];
-        $class->projectRepo = $deploy['projectRepo'] ?? null;
+        $class->projectName = $deploy['name'];
+        $class->projectRepo = $deploy['repo'] ?? null;
         $class->servers = collect($deploy['servers']);
         $class->commands = collect($deploy['commands']);
 
