@@ -105,7 +105,7 @@ class JsonDeployment implements DeploymentInterface
             $errors->push('No servers are defined');
         }
 
-        if(!$this->isTriggered) {
+        if (! $this->isTriggered) {
             if ($this->commands->count() == 0) {
                 $errors->push('At least one command is required.');
             }

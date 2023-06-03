@@ -116,7 +116,8 @@ class PhpDeployment implements DeploymentInterface
         return ! ($data == false);
     }
 
-    public function validate(){
+    public function validate()
+    {
         $errors = collect();
 
         if (empty($this->projectName)) {
@@ -131,7 +132,7 @@ class PhpDeployment implements DeploymentInterface
             $errors->push('At least one server is required.');
         }
 
-        if(!$this->isTriggered) {
+        if (! $this->isTriggered) {
             if ($this->commands->count() == 0) {
                 $errors->push('At least one command is required.');
             }

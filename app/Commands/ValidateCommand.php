@@ -35,11 +35,9 @@ class ValidateCommand extends Command
             $deploy = JsonDeployment::load();
         } elseif (YamlDeployment::exists()) {
             $deploy = YamlDeployment::load();
-        } elseif (PhpDeployment::exists()){
+        } elseif (PhpDeployment::exists()) {
             $deploy = PhpDeployment::load();
-        }
-
-        else {
+        } else {
             $this->error('No deploy file found. Please run `init` to create one.');
 
             return Command::FAILURE;
