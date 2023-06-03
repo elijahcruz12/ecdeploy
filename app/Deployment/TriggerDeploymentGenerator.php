@@ -64,10 +64,6 @@ class TriggerDeploymentGenerator
     public function defaultCommands(): static
     {
         $this->commands = [
-            'before' => [],
-            'during' => [],
-            'after' => [],
-            'extra' => [],
         ];
 
         return $this;
@@ -76,29 +72,6 @@ class TriggerDeploymentGenerator
     public function laravelCommands()
     {
         $this->commands = [
-            'before' => [
-                'php artisan down',
-                'php artisan optimize:clear',
-                'git pull origin master',
-                'composer install --no-interaction --prefer-dist --no-dev --optimize-autoloader',
-            ],
-            'during' => [
-                'php artisan migrate --force',
-                'php artisan config:cache',
-                'php artisan route:cache',
-                'php artisan view:cache',
-            ],
-            'after' => [
-                'php artisan up',
-            ],
-            'queue' => [
-                'php artisan queue:restart',
-            ],
-            'node' => [
-                'npm install',
-                'npm run prod',
-            ],
-
         ];
 
         return $this;
