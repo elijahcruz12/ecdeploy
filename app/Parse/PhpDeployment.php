@@ -14,6 +14,8 @@ class PhpDeployment implements DeploymentInterface
 
     public Collection|null $servers = null;
 
+    public bool $isTriggered = false;
+
     public Collection|null $commands = null;
 
     public static function load(): static
@@ -30,6 +32,7 @@ class PhpDeployment implements DeploymentInterface
         $class->projectName = $deploy['name'];
         $class->projectRepo = $deploy['repo'] ?? null;
         $class->servers = collect($deploy['servers']);
+        $class->isTriggered = $deploy['triggers'] ?? false;
         $class->commands = collect($deploy['commands']);
 
         return $class;
@@ -97,7 +100,11 @@ class PhpDeployment implements DeploymentInterface
 
         $class = new self();
 
-        $class->deployment = new Deployment($deploy);
+        $class->projectName = $deploy['name'];
+        $class->projectRepo = $deploy['repo'] ?? null;
+        $class->servers = collect($deploy['servers']);
+        $class->isTriggered = $deploy['triggers'] ?? false;
+        $class->commands = collect($deploy['commands']);
 
         return $class;
     }

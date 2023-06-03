@@ -3,6 +3,7 @@
 namespace App\Commands;
 
 use App\Deployment\DeployGenerator;
+use App\Deployment\TriggerDeploymentGenerator;
 use App\Parse\JsonDeployment;
 use App\Parse\YamlDeployment;
 use Illuminate\Console\Scheduling\Schedule;
@@ -19,7 +20,8 @@ class InitializationCommand extends Command
     protected $signature = 'init
     {--laravel : Created a laravel based deploy.json}
     {--gitignore : Add deploy.json to .gitignore}
-    {--format=json : What format you want the deploy file to be in. Options: json, yaml, php}';
+    {--format=json : What format you want the deploy file to be in. Options: json, yaml, php}
+    {--trigger : Use triggers to external deployment services.}';
 
     /**
      * The description of the command.
@@ -65,7 +67,11 @@ class InitializationCommand extends Command
 
         $projectRepo = $this->ask('Project Git Repo URL', $origin);
 
-        $generator = new DeployGenerator($projectName, $projectRepo);
+        if ($this->option('trigger')) {
+            $generator = new TriggerDeploymentGenerator($projectName, $projectRepo);
+        } else {
+            $generator = new DeployGenerator($projectName, $projectRepo);
+        }
 
         $generator->defaultServers();
 

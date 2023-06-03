@@ -14,6 +14,8 @@ class JsonDeployment implements DeploymentInterface
 
     public Collection|null $servers = null;
 
+    public bool $isTriggered = false;
+
     public Collection|null $commands = null;
 
     public function __construct()
@@ -29,6 +31,7 @@ class JsonDeployment implements DeploymentInterface
 
         $class->projectName = $deploy['name'];
         $class->projectRepo = $deploy['repo'] ?? null;
+        $class->isTriggered = $deploy['triggers'] ?? false;
         $class->servers = collect($deploy['servers']);
         $class->commands = collect($deploy['commands']);
 
@@ -41,7 +44,10 @@ class JsonDeployment implements DeploymentInterface
     public function serversByTags(array $tags): static
     {
 
-        $this->servers->filter(function ($server) use ($tags) {
+        // Inside each server, we have a tags array. We want to filter
+        // the servers collection to only include servers that have
+        // at least one of the tags we are looking for.
+        $this->servers = $this->servers->filter(function ($server) use ($tags) {
             return count(array_intersect($server['tags'], $tags)) > 0;
         });
 
@@ -122,6 +128,7 @@ class JsonDeployment implements DeploymentInterface
         $class->projectName = $deploy['name'];
         $class->projectRepo = $deploy['repo'] ?? null;
         $class->servers = collect($deploy['servers']);
+        $class->isTriggered = $deploy['triggers'] ?? false;
         $class->commands = collect($deploy['commands']);
 
         return $class;
