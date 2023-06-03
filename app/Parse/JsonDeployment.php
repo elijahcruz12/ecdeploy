@@ -61,7 +61,11 @@ class JsonDeployment implements DeploymentInterface
     {
         $stages = $server['commands'];
 
-        $serverCommands = [];
+        $serverCommands = [
+            'echo "Connction to '.$server['name'].' successful"',
+            'mkdir -p '.$server['path'],
+            'cd '.$server['path'],
+        ];
 
         foreach ($this->commands as $stage => $commands) {
             if (in_array($stage, $stages)) {
