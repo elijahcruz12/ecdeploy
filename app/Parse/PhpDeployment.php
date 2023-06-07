@@ -14,6 +14,8 @@ class PhpDeployment implements DeploymentInterface
 
     public Collection|null $servers = null;
 
+    public bool $isTriggered = false;
+
     public Collection|null $commands = null;
 
     public static function load(): static
@@ -30,6 +32,7 @@ class PhpDeployment implements DeploymentInterface
         $class->projectName = $deploy['name'];
         $class->projectRepo = $deploy['repo'] ?? null;
         $class->servers = collect($deploy['servers']);
+        $class->isTriggered = $deploy['triggers'] ?? false;
         $class->commands = collect($deploy['commands']);
 
         return $class;
@@ -97,7 +100,11 @@ class PhpDeployment implements DeploymentInterface
 
         $class = new self();
 
-        $class->deployment = new Deployment($deploy);
+        $class->projectName = $deploy['name'];
+        $class->projectRepo = $deploy['repo'] ?? null;
+        $class->servers = collect($deploy['servers']);
+        $class->isTriggered = $deploy['triggers'] ?? false;
+        $class->commands = collect($deploy['commands']);
 
         return $class;
     }
@@ -107,5 +114,30 @@ class PhpDeployment implements DeploymentInterface
         $data = openssl_decrypt(file_get_contents(getcwd().'/deploy.php.enc'), 'aes-256-cbc', $password, 0, substr(hash('sha256', 'deploy'), 0, 16));
 
         return ! ($data == false);
+    }
+
+    public function validate()
+    {
+        $errors = collect();
+
+        if (empty($this->projectName)) {
+            $errors->push('Project name is required.');
+        }
+
+        if (empty($this->projectRepo)) {
+            $errors->push('Project repo is required.');
+        }
+
+        if ($this->servers->count() == 0) {
+            $errors->push('At least one server is required.');
+        }
+
+        if (! $this->isTriggered) {
+            if ($this->commands->count() == 0) {
+                $errors->push('At least one command is required.');
+            }
+        }
+
+        return $errors;
     }
 }

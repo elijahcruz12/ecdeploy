@@ -7,6 +7,7 @@ use App\Parse\PhpDeployment;
 use App\Parse\YamlDeployment;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Http;
 use LaravelZero\Framework\Commands\Command;
 use Spatie\Ssh\Ssh;
 
@@ -97,28 +98,74 @@ class DeployCommand extends Command
             $deploy->serversByName($serverChoice);
         }
 
-        $deploy->servers->each(function ($server) use ($deploy) {
+        if (! $deploy->isTriggered) {
+            $deploy->servers->each(function ($server) use ($deploy) {
 
-            // Get the private key from ~/.ssh/config
-            // Because we run the command as the user, we need to get the private key from the config
+                // Get the private key from ~/.ssh/config
+                // Because we run the command as the user, we need to get the private key from the config
 
-            $this->info('Deploying to '.$server['name']);
+                $this->info('Deploying to '.$server['name']);
 
-            $process = Ssh::create($server['user'], $server['host'], $server['port'] ?? 22)
-                ->usePrivateKey(getenv('HOME').'/.ssh/id_rsa')
-                ->disablePasswordAuthentication()
-                ->onOutput(function ($type, $line) {
-                    $this->output->write($line);
-                })
-                ->execute($deploy->getCommandsForServer($server));
+                $process = Ssh::create($server['user'], $server['host'], $server['port'] ?? 22)
+                    ->usePrivateKey(getenv('HOME').'/.ssh/id_rsa')
+                    ->disablePasswordAuthentication()
+                    ->onOutput(function ($type, $line) {
+                        $this->output->write($line);
+                    })
+                    ->execute($deploy->getCommandsForServer($server));
 
-            if ($process->isSuccessful()) {
-                $this->info('Deployed to '.$server['name']);
-            } else {
-                $this->error('Failed to deploy to '.$server['name']);
-            }
+                if ($process->isSuccessful()) {
+                    $this->info('Deployed to '.$server['name']);
+                } else {
+                    $this->error('Failed to deploy to '.$server['name']);
+                }
 
-        });
+            });
+        } else {
+
+            $deploy->servers->each(function ($server) {
+                $url = $server['trigger']['url'];
+                $method = $server['trigger']['method'];
+                $headers = $server['trigger']['headers'] ?? null;
+
+                $this->info('Deploying to '.$server['name']);
+
+                if ($url == '' || $url == null) {
+                    $this->error('Failed to deploy to '.$server['name']);
+                    $this->error('No trigger url found.');
+
+                    return;
+                }
+
+                if ($method == '' || $method == null) {
+                    $this->error('Failed to deploy to '.$server['name']);
+                    $this->error('No trigger method found.');
+
+                    return;
+                }
+
+                try {
+                    $process = Http::withHeaders($headers)
+                        ->$method($url);
+                } catch (\Exception $e) {
+                    $this->error('Failed to deploy to '.$server['name']);
+                    if ($this->getOutput()->getVerbosity() == 64) {
+                        $this->error($e->getMessage());
+                    }
+
+                    return;
+                }
+
+                if ($process->successful()) {
+                    $this->info('Sent deploy trigger for '.$server['name']);
+                } else {
+                    $this->error('Failed to deploy to '.$server['name']);
+                    if ($this->getOutput()->getVerbosity() == 64) {
+                        $this->error($process->body());
+                    }
+                }
+            });
+        }
 
         $this->info('Deployed to all selected servers.');
 

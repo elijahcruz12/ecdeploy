@@ -15,6 +15,8 @@ class YamlDeployment implements DeploymentInterface
 
     public Collection|null $servers = null;
 
+    public bool $isTriggered = false;
+
     public Collection|null $commands = null;
 
     public static function load(): static
@@ -26,6 +28,7 @@ class YamlDeployment implements DeploymentInterface
         $class->projectName = $yaml['name'];
         $class->projectRepo = $yaml['repo'] ?? null;
         $class->servers = collect($yaml['servers']);
+        $class->isTriggered = $deploy['triggers'] ?? false;
         $class->commands = collect($yaml['commands']);
 
         return $class;
@@ -95,8 +98,10 @@ class YamlDeployment implements DeploymentInterface
             $errors->push('No servers are defined');
         }
 
-        if ($this->commands->count() === 0) {
-            $errors->push('No commands are defined');
+        if (! $this->isTriggered) {
+            if ($this->commands->count() == 0) {
+                $errors->push('At least one command is required.');
+            }
         }
 
         return $errors;
@@ -118,6 +123,7 @@ class YamlDeployment implements DeploymentInterface
         $class->projectName = $yaml['name'];
         $class->projectRepo = $yaml['repo'] ?? null;
         $class->servers = collect($yaml['servers']);
+        $class->isTriggered = $deploy['triggers'] ?? false;
         $class->commands = collect($yaml['commands']);
 
         return $class;
